@@ -21,7 +21,7 @@ def query():
 	if not zipcode:
 		zipcode = 94102
 
-	url = 'https://rets.io/api/v1/test/listings?access_token=%s&zipCode=%s&price[lt]=%s' % \
+	url = 'https://rets.io/api/v1/test_sf/listings?access_token=%s&zipCode=%s&price[lt]=%s' % \
 		(ACCESS_TOKEN, zipcode, price)
 	
 	print zipcode
