@@ -7,34 +7,6 @@ import json
 app = Flask(__name__)
 ACCESS_TOKEN = 'f4106c6344a86aaa7805906ed9e2c411'
 
-@app.route('/personality', methods=['GET'])
-def personality():
-    token = get_auth_token()
-    url = 'http://api-v2.applymagicsauce.com/like_ids'
-    req = Request(url)
-    header = {
-        'X-Auth-Token': token,
-        'Content-Type': 'application/json',
-        'Accept': 'application/json'
-    }
-    body = {
-        'traits': 'BIG5_Openess',
-        'uid': '1063389267005163'
-    }
-    for k,v in header.items():
-        req.add_header(k,v)
-    req.add_data(urllib.urlencode(body))
-    
-    try:
-        response = urlopen(req)        
-    except URLError, e:
-        print 'Check api_key/customer_id. Got an error code:', e
-    
-    if response.getcode() != 200:
-        data = json.loads(response.read())
-        token = data.get('token', '')
-        return token
-    return 'token'
 
 def get_auth_token():
     url = 'http://api-v2.applymagicsauce.com/auth'
