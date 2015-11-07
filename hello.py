@@ -6,20 +6,21 @@ import json
 app = Flask(__name__)
 ACCESS_TOKEN = 'f4106c6344a86aaa7805906ed9e2c411'
 
+@app.route('/', methods=['GET'])
+def hello():
+	return 'HomeGame server'
+
 @app.route('/query', methods=['GET'])
-def query():	
-	
+def query():
 	params = request.args
-	
 	if 'zipcode' in params:
 		zipcode = params.get('zipcode', '')
+	else:
+		zipcode = 94103
 	if 'price' in params:
 		price = params.get('price', '')
-	
-	if not price:
-		price = 1000
-	if not zipcode:
-		zipcode = 94102
+	else:
+		price = 1000000
 
 	url = 'https://rets.io/api/v1/test_sf/listings?access_token=%s&zipCode=%s&price[lt]=%s' % \
 		(ACCESS_TOKEN, zipcode, price)
