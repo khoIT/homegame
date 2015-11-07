@@ -6,15 +6,16 @@ import json
 
 app = Flask(__name__)
 ACCESS_TOKEN = 'f4106c6344a86aaa7805906ed9e2c411'
+PERSONALITY_TOKEN = ''
 
-
+@app.route('/personality', methods=['GET'])
 def get_auth_token():
     url = 'http://api-v2.applymagicsauce.com/auth'
     auth = Request(url)
     auth.add_header('Content-Type', 'application/json')
     data = {
-        'customer_id': '1997',
-        'api_key': 'vhhllbncv79i3gcr0m7p89pit3'
+        'customer_id': '1998',
+        'api_key': 'a677s17vkj1nbnj5m7r3oroamu'
     }
     try:
         response = urlopen(auth, json.dumps(data))
@@ -44,7 +45,7 @@ def query():
     else:
         price = 1000000
 
-    url = 'https://rets.io/api/v1/armls/listings?access_token=%s&zipCode=%s&price[lt]=%s' % \
+    url = 'https://rets.io/api/v1/armls/listings?access_token=%s&status=Active&zipCode=%s&price[lt]=%s' % \
         (ACCESS_TOKEN, zipcode, price)    
     query = Request(url)
     try:
