@@ -129,16 +129,26 @@ def beacon_out():
     uid = int(params.get('uid', ''))
     bid = int(params.get('bid', ''))
 
-    data = USER_BEACON[uid]  
+    data = USER_BEACON[uid]
     if uid not in USER_BEACON:
         return
     else:
         data = USER_BEACON[uid]
 
+
     if bid not in data:
         return
     else:
         data[bid]['out'] = datetime.utcnow().strftime('%c')
+        in_time = datetime.strptime(data[bid]['in'], '%c')
+        out_time = datetime.strptime(data[bid]['out'], '%c')
+        beacon_total = out_time - in_time
+        data[bid]['total'] = beacon_total.total_seconds()
+
+    user_total = 0
+    for k,v in data.iteritems():
+        user_total += v['total']
+        data['total'] = user_total
 
     print "Successfully saved!"
     print json.dumps(USER_BEACON)
