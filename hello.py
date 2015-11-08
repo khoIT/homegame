@@ -3,12 +3,11 @@ import urllib
 from urllib2 import Request, urlopen, URLError
 from datetime import datetime
 import pdb
-import json
+import simplejson as json
 
 app = Flask(__name__)
 ACCESS_TOKEN = 'f4106c6344a86aaa7805906ed9e2c411'
 PERSONALITY_TOKEN = ''
-USER_BEACON = {}  # dictionary of dictionary
 
 
 @app.route('/personal_query', methods=['GET'])
@@ -130,14 +129,31 @@ def get_auth_token():
 
 @app.route('/user_beacon', methods=['GET'])
 def user_beacon():
-    return json.dumps(USER_BEACON)
+    f = open('user_beacon.json', 'r')
+    data = json.loads(f.read())
+    
+    return json.dumps(data )
 
 
 @app.route('/beacon_in', methods=['POST'])
 def beacon_in():
+<<<<<<< HEAD
     params = request.args
     uid = int(params.get('uid', ''))
     bid = int(params.get('bid', ''))
+=======
+    f = open('user_beacon.json', 'r')
+    data = f.read()
+    f.close()
+    if data:
+        USER_BEACON = json.loads(data)
+    else:
+        USER_BEACON = {}
+
+    params = request.args    
+    uid = params.get('uid', '')
+    bid = params.get('bid', '')
+>>>>>>> 6f80c3dfc918a42ce0160e4166cf634c6563384c
 
     if uid not in USER_BEACON:
         data = USER_BEACON[uid] = {}  #  {bid1: {'in':time_in, 'out':time_out},
@@ -147,24 +163,38 @@ def beacon_in():
 
     data[bid] = {}
     data[bid]['in'] = datetime.utcnow().strftime('%c')
+<<<<<<< HEAD
 
     print "Successfully saved!"
+=======
+    
+    print "Successfully saved!"    
+    f = open('user_beacon.json', 'w')
+    json.dump(USER_BEACON, f)
+    f.close()
+>>>>>>> 6f80c3dfc918a42ce0160e4166cf634c6563384c
     print json.dumps(USER_BEACON)
     flask.redirect(flask.url_for('user_beacon'))
 
 
 @app.route('/beacon_out', methods=['POST'])
 def beacon_out():
-    params = request.args
-    uid = int(params.get('uid', ''))
-    bid = int(params.get('bid', ''))
+    f = open('user_beacon.json', 'r')
+    data = f.read()
+    f.close()
+    if data:
+        USER_BEACON = json.loads(data)
+    else:
+        USER_BEACON = {}
 
-    data = USER_BEACON[uid]
+    params = request.args
+    uid = params.get('uid', '')
+    bid = params.get('bid', '')
+
     if uid not in USER_BEACON:
         return
     else:
         data = USER_BEACON[uid]
-
 
     if bid not in data:
         return
@@ -176,11 +206,16 @@ def beacon_out():
         data[bid]['total'] = beacon_total.total_seconds()
 
     user_total = 0
-    for k,v in data.iteritems():
-        user_total += v['total']
+    for k in data.keys():
+        if type(data[k]) == dict and 'total' in data[k]:
+            user_total += data[k]['total']
+    if user_total > 0:
         data['total'] = user_total
 
     print "Successfully saved!"
+    f = open('user_beacon.json', 'w')    
+    json.dump(USER_BEACON, f)
+    f.close()
     print json.dumps(USER_BEACON)
     flask.redirect(flask.url_for('user_beacon'))
 
