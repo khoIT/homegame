@@ -131,17 +131,17 @@ def get_auth_token():
 def user_beacon():
     f = open('user_beacon.json', 'r')
     data = json.loads(f.read())
-    
+
     return json.dumps(data )
 
 
 @app.route('/beacon_in', methods=['POST'])
 def beacon_in():
-<<<<<<< HEAD
+
     params = request.args
     uid = int(params.get('uid', ''))
     bid = int(params.get('bid', ''))
-=======
+
     f = open('user_beacon.json', 'r')
     data = f.read()
     f.close()
@@ -150,10 +150,10 @@ def beacon_in():
     else:
         USER_BEACON = {}
 
-    params = request.args    
+    params = request.args
     uid = params.get('uid', '')
     bid = params.get('bid', '')
->>>>>>> 6f80c3dfc918a42ce0160e4166cf634c6563384c
+
 
     if uid not in USER_BEACON:
         data = USER_BEACON[uid] = {}  #  {bid1: {'in':time_in, 'out':time_out},
@@ -163,16 +163,15 @@ def beacon_in():
 
     data[bid] = {}
     data[bid]['in'] = datetime.utcnow().strftime('%c')
-<<<<<<< HEAD
+
 
     print "Successfully saved!"
-=======
-    
-    print "Successfully saved!"    
+
+
     f = open('user_beacon.json', 'w')
     json.dump(USER_BEACON, f)
     f.close()
->>>>>>> 6f80c3dfc918a42ce0160e4166cf634c6563384c
+
     print json.dumps(USER_BEACON)
     flask.redirect(flask.url_for('user_beacon'))
 
@@ -213,7 +212,7 @@ def beacon_out():
         data['total'] = user_total
 
     print "Successfully saved!"
-    f = open('user_beacon.json', 'w')    
+    f = open('user_beacon.json', 'w')
     json.dump(USER_BEACON, f)
     f.close()
     print json.dumps(USER_BEACON)
