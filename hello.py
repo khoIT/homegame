@@ -1,13 +1,14 @@
 from flask import Flask, request
 import urllib
 from urllib2 import Request, urlopen, URLError
+from datetime import datetime
 import pdb
 import json
 
 app = Flask(__name__)
 ACCESS_TOKEN = 'f4106c6344a86aaa7805906ed9e2c411'
 PERSONALITY_TOKEN = ''
-USERS = {}
+USER_BEACON = {}  # dictionary of dictionary
 
 
 @app.route('/personal_query', methods=['GET'])
@@ -97,18 +98,51 @@ def get_auth_token():
     return
 
 
-# @app.route('/beacon_in', methods=['POST'])
-# def in_beacon(user_id, time):
-#     params = request.args
-#     if 'user_id' in params:
-#         uid = params.get('user_id', '')
-#     if 'time' in params:
-#         time = params.get('time', '')
+@app.route('/user_beacon', methods=['GET'])
+def user_beacon():
+    return json.dumps(USER_BEACON)
 
-#     data = USERS[user_id] = []
-#     data[len(data)]['in'] = time
 
-# def out_beacon(user_id):
+@app.route('/beacon_in', methods=['POST'])
+def beacon_in():
+    params = request.args    
+    uid = int(params.get('uid', ''))
+    bid = int(params.get('bid', ''))
+
+    if uid not in USER_BEACON:
+        data = USER_BEACON[uid] = {}  #  {bid1: {'in':time_in, 'out':time_out}, 
+                                      #   bid2: {'in':time_in, 'out':time_out} }
+    else:
+        data = USER_BEACON[uid]
+
+    data[bid] = {}
+    data[bid]['in'] = datetime.utcnow().strftime('%c')
+    
+    print "Successfully saved!"
+    print json.dumps(USER_BEACON)
+    flask.redirect(flask.url_for('user_beacon'))
+
+
+@app.route('/beacon_out', methods=['POST'])
+def beacon_out():
+    params = request.args
+    uid = int(params.get('uid', ''))
+    bid = int(params.get('bid', ''))
+
+    data = USER_BEACON[uid]  
+    if uid not in USER_BEACON:
+        return
+    else:
+        data = USER_BEACON[uid]
+
+    if bid not in data:
+        return
+    else:
+        data[bid]['out'] = datetime.utcnow().strftime('%c')
+
+    print "Successfully saved!"
+    print json.dumps(USER_BEACON)
+    flask.redirect(flask.url_for('user_beacon'))
 
 
 @app.route('/', methods=['GET'])
