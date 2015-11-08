@@ -10,6 +10,36 @@ PERSONALITY_TOKEN = ''
 USERS = {}
 
 
+@app.route('/personal_query', methods=['GET'])
+def personal_query():
+    params = request.args
+    if 'zipcode' in params:
+        zipcode = params.get('zipcode', '')
+    if 'downpayment' in params:
+        downpayment = params.get('zipcode', '')
+    
+    data = personality(1)    
+    per = json.loads(data)
+    o = per.get('Openness', 0)
+    e = per.get('Extraversion', 0)
+    con = per.get('Conscientiousness', 0)
+
+    url = 'https://rets.io/api/v1/armls/listings?access_token=%s&status=Active&zipCode=%s&price[lt]=%s&acres[lt]=%s' % (ACCESS_TOKEN, zipcode, downpayment*5, o*10)
+    
+    query = Request(url)
+    try:
+        response = urlopen(query)        
+    except URLError, e:
+        print 'No kittez. Got an error code:', e
+    
+    data = response.read()
+    if type(data) == str:
+        body = json.loads(data)
+        if body.get('status', '') == 200:
+            listings = body.get('bundle', {})
+            return json.dumps(listings)
+
+
 @app.route('/personality/<user_id>', methods=['GET'])
 def personality(user_id):
     token = get_auth_token()
