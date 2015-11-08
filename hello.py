@@ -22,12 +22,42 @@ def personal_query():
 
     data = personality(1)
     per = json.loads(data)
-    o = per.get('Openness', 0)
-    e = per.get('Extraversion', 0)
+    opn = per.get('Openness', 0)
     con = per.get('Conscientiousness', 0)
+    ext = per.get('Extraversion', 0)
+    agr = per.get('Agreeableness', 0)
+    neu = per.get('Neuroticism', 0)
 
-    url = 'https://rets.io/api/v1/armls/listings?access_token=%s&status=Active&zipCode=%s&price[lt]=%s&acres[lt]=%s' % (ACCESS_TOKEN, zipcode, int(downpayment)*5, o*10)
+    arr = []
+    resultSingle = 0.2 * float(opn) + 0.3 * float(con) + 0.2 * float(ext) + 0.2 * float(agr) + 0.1 * float(neu)
+    arr.append(resultSingle)
+    resultCondominum = 0.1 * float(opn) + 0.2 * float(con) + 0.3 * float(ext) + 0.3 * float(agr) + 0.1 * float(neu)
+    arr.append(resultCondominum)
+    resultApartment = 0.4 * float(opn) + 0.1 * float(con) + 0.3 * float(ext) + 0.1 * float(agr) + 0.1 * float(neu)
+    arr.append(resultApartment)
+    resultTownhouse = 0.2 * float(opn) + 0.2 * float(con) + 0.3 * float(ext) + 0.1 * float(agr) + 0.2 * float(neu)
+    arr.append(resultTownhouse)
 
+    biggest = 0
+    biggestIndex = 0
+    for item in arr:
+        if item > biggest:
+            biggest = item
+            biggestIndex = arr.index(item)
+            #index of biggest number
+    finalType = ""
+    if biggestIndex == 0:
+        finalType = "Single%Family%Residence"
+    if biggestIndex == 1:
+        finalType = "Condominium"
+    if biggestIndex == 2:
+        finalType = "Apartment"
+    if biggestIndex == 3:
+        finalType = "Townhouse"
+    print finalType
+
+    url = 'https://rets.io/api/v1/armls/listings?access_token=%s&status=Active&zipCode=%s&price[lt]=%s&subtype=%s' %(ACCESS_TOKEN,zipcode,int(downpayment)*5,finalType)
+    # url = 'https://rets.io/api/v1/armls/listings?access_token=%s&status=Active&zipCode=%s&price[lt]=%s' %(ACCESS_TOKEN,zipcode,int(downpayment)*5,finalType)
     query = Request(url)
     try:
         response = urlopen(query)
@@ -105,19 +135,19 @@ def user_beacon():
 
 @app.route('/beacon_in', methods=['POST'])
 def beacon_in():
-    params = request.args    
+    params = request.args
     uid = int(params.get('uid', ''))
     bid = int(params.get('bid', ''))
 
     if uid not in USER_BEACON:
-        data = USER_BEACON[uid] = {}  #  {bid1: {'in':time_in, 'out':time_out}, 
+        data = USER_BEACON[uid] = {}  #  {bid1: {'in':time_in, 'out':time_out},
                                       #   bid2: {'in':time_in, 'out':time_out} }
     else:
         data = USER_BEACON[uid]
 
     data[bid] = {}
     data[bid]['in'] = datetime.utcnow().strftime('%c')
-    
+
     print "Successfully saved!"
     print json.dumps(USER_BEACON)
     flask.redirect(flask.url_for('user_beacon'))
