@@ -46,7 +46,7 @@ def personal_query():
             #index of biggest number
     finalType = ""
     if biggestIndex == 0:
-        finalType = "Single%Family%Residence"
+        finalType = "Single%20Family%20Residence"
     if biggestIndex == 1:
         finalType = "Condominium"
     if biggestIndex == 2:
@@ -56,7 +56,7 @@ def personal_query():
     print finalType
 
     url = 'https://rets.io/api/v1/armls/listings?access_token=%s&status=Active&zipCode=%s&price[lt]=%s&subtype=%s' %(ACCESS_TOKEN,zipcode,int(downpayment)*5,finalType)
-    # url = 'https://rets.io/api/v1/armls/listings?access_token=%s&status=Active&zipCode=%s&price[lt]=%s' %(ACCESS_TOKEN,zipcode,int(downpayment)*5,finalType)
+    # url = 'https://rets.io/api/v1/armls/listings?access_token=%s&status=Active&zipCode=%s&price[lt]=%s' %(ACCESS_TOKEN,zipcode,int(downpayment)*5)
     query = Request(url)
     try:
         response = urlopen(query)
