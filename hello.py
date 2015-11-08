@@ -9,6 +9,25 @@ app = Flask(__name__)
 ACCESS_TOKEN = 'f4106c6344a86aaa7805906ed9e2c411'
 PERSONALITY_TOKEN = ''
 
+@app.route('/agent_query', methods=['GET'])
+def agent_query():
+    params = request.args
+    if 'mlsOfficeID' in params:
+        mlsOfficeID = params.get('mlsOfficeID', '')
+
+    url = 'https://rets.io/api/v1/armls/agents?access_token=%s&mlsOfficeID=%s&status=Active' %(ACCESS_TOKEN,20110829170205794604000000)
+    query = Request(url)
+    try:
+        response = urlopen(query)
+    except URLError, e:
+        print 'No kittez. Got an error code:', e
+
+    data = response.read()
+    if type(data) == str:
+        body = json.loads(data)
+        if body.get('status', '') == 200:
+            listings = body.get('bundle', {})
+            return json.dumps(listings)
 
 @app.route('/personal_query', methods=['GET'])
 def personal_query():
@@ -56,7 +75,6 @@ def personal_query():
     print finalType
 
     url = 'https://rets.io/api/v1/armls/listings?access_token=%s&status=Active&zipCode=%s&price[lt]=%s&subtype=%s' %(ACCESS_TOKEN,zipcode,int(downpayment)*5,finalType)
-    # url = 'https://rets.io/api/v1/armls/listings?access_token=%s&status=Active&zipCode=%s&price[lt]=%s' %(ACCESS_TOKEN,zipcode,int(downpayment)*5)
     query = Request(url)
     try:
         response = urlopen(query)
@@ -253,3 +271,7 @@ def query():
 
 if __name__ == '__main__':
     app.run()
+
+
+
+# curl -v -H "Accept: application/json" -H "Content-type: application/json" -X POST -d '{bid1: {'in':time_in, 'out':time_out},bid2: {'in':time_in, 'out':time_out} } '  http://localhost:5000//beacon_out/
